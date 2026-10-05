@@ -1,7 +1,7 @@
 package com.fontys.shiftpayroll.service;
 
-import com.fontys.shiftpayroll.domain.Availability;
-import com.fontys.shiftpayroll.domain.Employee;
+import com.fontys.shiftpayroll.persistance.entities.AvailabilityEntity;
+import com.fontys.shiftpayroll.persistance.entities.EmployeeEntity;
 import com.fontys.shiftpayroll.dto.SetAvailabilityRequest;
 import com.fontys.shiftpayroll.interfaces.repoInterfaces.IAvailabilityRepository;
 import com.fontys.shiftpayroll.interfaces.repoInterfaces.IEmployeeRepository;
@@ -41,22 +41,22 @@ class AvailabilityServiceTest {
     @Test
     void setAvailability_savesSuccessfully_whenTimesAreValid() {
         UUID employeeId = UUID.randomUUID();
-        Employee employee = new Employee("Sarah Okonkwo", new BigDecimal("18.50"));
+        EmployeeEntity employee = new EmployeeEntity("Sarah Okonkwo", new BigDecimal("18.50"));
 
         when(iEmployeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(iAvailabilityRepository.save(any(Availability.class)))
+        when(iAvailabilityRepository.save(any(AvailabilityEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         SetAvailabilityRequest request = new SetAvailabilityRequest(
                 DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(17, 0)
         );
 
-        Availability result = availabilityService.setAvailability(employeeId, request);
+        AvailabilityEntity result = availabilityService.setAvailability(employeeId, request);
 
         assertEquals(DayOfWeek.MONDAY, result.getDay());
         assertEquals(LocalTime.of(9, 0), result.getStartTime());
         assertEquals(LocalTime.of(17, 0), result.getEndTime());
-        verify(iAvailabilityRepository, times(1)).save(any(Availability.class));
+        verify(iAvailabilityRepository, times(1)).save(any(AvailabilityEntity.class));
     }
 
     @Test

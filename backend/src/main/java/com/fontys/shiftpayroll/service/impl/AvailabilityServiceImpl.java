@@ -1,7 +1,7 @@
 package com.fontys.shiftpayroll.service.impl;
 
-import com.fontys.shiftpayroll.domain.Availability;
-import com.fontys.shiftpayroll.domain.Employee;
+import com.fontys.shiftpayroll.persistance.entities.AvailabilityEntity;
+import com.fontys.shiftpayroll.persistance.entities.EmployeeEntity;
 import com.fontys.shiftpayroll.dto.SetAvailabilityRequest;
 import com.fontys.shiftpayroll.interfaces.repoInterfaces.IAvailabilityRepository;
 import com.fontys.shiftpayroll.interfaces.repoInterfaces.IEmployeeRepository;
@@ -24,15 +24,15 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
     }
 
     @Override
-    public Availability setAvailability(UUID employeeId, SetAvailabilityRequest request) {
+    public AvailabilityEntity setAvailability(UUID employeeId, SetAvailabilityRequest request) {
         if (!request.endTime().isAfter(request.startTime())) {
             throw new IllegalArgumentException("End time must be after start time");
         }
 
-        Employee employee = iEmployeeRepository.findById(employeeId)
+        EmployeeEntity employee = iEmployeeRepository.findById(employeeId)
                 .orElseThrow(() -> new NoSuchElementException("Employee not found: " + employeeId));
 
-        Availability availability = new Availability(
+        AvailabilityEntity availability = new AvailabilityEntity(
                 employee, request.day(), request.startTime(), request.endTime()
         );
 
@@ -40,7 +40,7 @@ public class AvailabilityServiceImpl implements IAvailabilityService {
     }
 
     @Override
-    public List<Availability> getAvailabilityForEmployee(UUID employeeId) {
+    public List<AvailabilityEntity> getAvailabilityForEmployee(UUID employeeId) {
         return iAvailabilityRepository.findByEmployeeId(employeeId);
     }
 }

@@ -1,21 +1,14 @@
-package com.fontys.shiftpayroll.domain;
+package com.fontys.shiftpayroll.persistance.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
-public class Availability {
+@Table(name = "availability")
+public class AvailabilityEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,7 +16,7 @@ public class Availability {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "employee_id", nullable = false)
-    private Employee employee;
+    private EmployeeEntity employee;
 
     // Column is named day_of_week because "day" is a reserved word in some
     // database
@@ -37,11 +30,11 @@ public class Availability {
     @Column(nullable = false)
     private LocalTime endTime;
 
-    protected Availability() {
+    protected AvailabilityEntity() {
         // required by JPA
     }
 
-    public Availability(Employee employee, DayOfWeek day, LocalTime startTime, LocalTime endTime) {
+    public AvailabilityEntity(EmployeeEntity employee, DayOfWeek day, LocalTime startTime, LocalTime endTime) {
         this.employee = employee;
         this.day = day;
         this.startTime = startTime;
@@ -52,7 +45,7 @@ public class Availability {
         return id;
     }
 
-    public Employee getEmployee() {
+    public EmployeeEntity getEmployee() {
         return employee;
     }
 

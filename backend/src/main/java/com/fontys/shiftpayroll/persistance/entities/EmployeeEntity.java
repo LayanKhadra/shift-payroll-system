@@ -1,16 +1,13 @@
-package com.fontys.shiftpayroll.domain;
+package com.fontys.shiftpayroll.persistance.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-public class Employee {
+@Table(name = "employee")
+public class EmployeeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -22,11 +19,11 @@ public class Employee {
     @Column(nullable = false)
     private BigDecimal hourlyRate;
 
-    protected Employee() {
+    protected EmployeeEntity() {
         // required by JPA
     }
 
-    public Employee(String name, BigDecimal hourlyRate) {
+    public EmployeeEntity(String name, BigDecimal hourlyRate) {
         this.name = name;
         this.hourlyRate = hourlyRate;
     }
