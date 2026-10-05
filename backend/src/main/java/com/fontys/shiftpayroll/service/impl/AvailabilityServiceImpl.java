@@ -3,8 +3,8 @@ package com.fontys.shiftpayroll.service.impl;
 import com.fontys.shiftpayroll.persistance.entities.AvailabilityEntity;
 import com.fontys.shiftpayroll.persistance.entities.EmployeeEntity;
 import com.fontys.shiftpayroll.dto.SetAvailabilityRequest;
-import com.fontys.shiftpayroll.interfaces.repoInterfaces.IAvailabilityRepository;
-import com.fontys.shiftpayroll.interfaces.repoInterfaces.IEmployeeRepository;
+import com.fontys.shiftpayroll.persistance.AvailabilityJpaRepository;
+import com.fontys.shiftpayroll.persistance.EmployeeJpaRepository;
 import com.fontys.shiftpayroll.interfaces.serviceInterfaces.IAvailabilityService;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +14,11 @@ import java.util.UUID;
 
 @Service
 public class AvailabilityServiceImpl implements IAvailabilityService {
-    private final IAvailabilityRepository iAvailabilityRepository;
-    private final IEmployeeRepository iEmployeeRepository;
+    private final AvailabilityJpaRepository iAvailabilityRepository;
+    private final EmployeeJpaRepository iEmployeeRepository;
 
-    public AvailabilityServiceImpl(IAvailabilityRepository iAvailabilityRepository,
-                                   IEmployeeRepository iEmployeeRepository) {
+    public AvailabilityServiceImpl(AvailabilityJpaRepository iAvailabilityRepository,
+                                   EmployeeJpaRepository iEmployeeRepository) {
         this.iAvailabilityRepository = iAvailabilityRepository;
         this.iEmployeeRepository = iEmployeeRepository;
     }

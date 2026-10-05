@@ -3,8 +3,8 @@ package com.fontys.shiftpayroll.service;
 import com.fontys.shiftpayroll.persistance.entities.AvailabilityEntity;
 import com.fontys.shiftpayroll.persistance.entities.EmployeeEntity;
 import com.fontys.shiftpayroll.dto.SetAvailabilityRequest;
-import com.fontys.shiftpayroll.interfaces.repoInterfaces.IAvailabilityRepository;
-import com.fontys.shiftpayroll.interfaces.repoInterfaces.IEmployeeRepository;
+import com.fontys.shiftpayroll.persistance.AvailabilityJpaRepository;
+import com.fontys.shiftpayroll.persistance.EmployeeJpaRepository;
 import com.fontys.shiftpayroll.service.impl.AvailabilityServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,14 +27,14 @@ import static org.mockito.Mockito.when;
 
 class AvailabilityServiceTest {
 
-    private IAvailabilityRepository iAvailabilityRepository;
-    private IEmployeeRepository iEmployeeRepository;
+    private AvailabilityJpaRepository iAvailabilityRepository;
+    private EmployeeJpaRepository iEmployeeRepository;
     private AvailabilityServiceImpl availabilityService;
 
     @BeforeEach
     void setUp() {
-        iAvailabilityRepository = mock(IAvailabilityRepository.class);
-        iEmployeeRepository = mock(IEmployeeRepository.class);
+        iAvailabilityRepository = mock(AvailabilityJpaRepository.class);
+        iEmployeeRepository = mock(EmployeeJpaRepository.class);
         availabilityService = new AvailabilityServiceImpl(iAvailabilityRepository, iEmployeeRepository);
     }
 
