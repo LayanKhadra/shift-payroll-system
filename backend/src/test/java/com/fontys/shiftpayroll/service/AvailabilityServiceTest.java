@@ -3,8 +3,8 @@ package com.fontys.shiftpayroll.service;
 import com.fontys.shiftpayroll.domain.Availability;
 import com.fontys.shiftpayroll.domain.Employee;
 import com.fontys.shiftpayroll.dto.SetAvailabilityRequest;
-import com.fontys.shiftpayroll.repository.AvailabilityRepository;
-import com.fontys.shiftpayroll.repository.EmployeeRepository;
+import com.fontys.shiftpayroll.interfaces.repoInterfaces.IAvailabilityRepository;
+import com.fontys.shiftpayroll.interfaces.repoInterfaces.IEmployeeRepository;
 import com.fontys.shiftpayroll.service.impl.AvailabilityServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,15 +27,15 @@ import static org.mockito.Mockito.when;
 
 class AvailabilityServiceTest {
 
-    private AvailabilityRepository availabilityRepository;
-    private EmployeeRepository employeeRepository;
+    private IAvailabilityRepository iAvailabilityRepository;
+    private IEmployeeRepository iEmployeeRepository;
     private AvailabilityServiceImpl availabilityService;
 
     @BeforeEach
     void setUp() {
-        availabilityRepository = mock(AvailabilityRepository.class);
-        employeeRepository = mock(EmployeeRepository.class);
-        availabilityService = new AvailabilityServiceImpl(availabilityRepository, employeeRepository);
+        iAvailabilityRepository = mock(IAvailabilityRepository.class);
+        iEmployeeRepository = mock(IEmployeeRepository.class);
+        availabilityService = new AvailabilityServiceImpl(iAvailabilityRepository, iEmployeeRepository);
     }
 
     @Test
@@ -43,8 +43,8 @@ class AvailabilityServiceTest {
         UUID employeeId = UUID.randomUUID();
         Employee employee = new Employee("Sarah Okonkwo", new BigDecimal("18.50"));
 
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(availabilityRepository.save(any(Availability.class)))
+        when(iEmployeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        when(iAvailabilityRepository.save(any(Availability.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         SetAvailabilityRequest request = new SetAvailabilityRequest(
@@ -56,7 +56,7 @@ class AvailabilityServiceTest {
         assertEquals(DayOfWeek.MONDAY, result.getDay());
         assertEquals(LocalTime.of(9, 0), result.getStartTime());
         assertEquals(LocalTime.of(17, 0), result.getEndTime());
-        verify(availabilityRepository, times(1)).save(any(Availability.class));
+        verify(iAvailabilityRepository, times(1)).save(any(Availability.class));
     }
 
     @Test
@@ -70,13 +70,13 @@ class AvailabilityServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 availabilityService.setAvailability(employeeId, request));
 
-        verifyNoInteractions(availabilityRepository);
+        verifyNoInteractions(iAvailabilityRepository);
     }
 
     @Test
     void setAvailability_throwsException_whenEmployeeNotFound() {
         UUID employeeId = UUID.randomUUID();
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.empty());
+        when(iEmployeeRepository.findById(employeeId)).thenReturn(Optional.empty());
 
         SetAvailabilityRequest request = new SetAvailabilityRequest(
                 DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(17, 0)
