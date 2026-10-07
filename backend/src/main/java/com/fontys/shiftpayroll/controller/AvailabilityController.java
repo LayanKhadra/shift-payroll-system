@@ -1,6 +1,6 @@
 package com.fontys.shiftpayroll.controller;
 
-import com.fontys.shiftpayroll.persistance.entities.AvailabilityEntity;
+import com.fontys.shiftpayroll.domain.Availability;
 import com.fontys.shiftpayroll.dto.AvailabilityResponse;
 import com.fontys.shiftpayroll.dto.SetAvailabilityRequest;
 import com.fontys.shiftpayroll.interfaces.serviceInterfaces.IAvailabilityService;
@@ -30,7 +30,9 @@ public class AvailabilityController {
     public ResponseEntity<AvailabilityResponse> setAvailability(
             @PathVariable UUID employeeId,
             @RequestBody SetAvailabilityRequest request) {
-        AvailabilityEntity saved = iAvailabilityService.setAvailability(employeeId, request);
+        Availability availability  = new Availability(
+                employeeId, request.day(), request.startTime(), request.endTime());
+        Availability saved = iAvailabilityService.setAvailability(availability);
         return ResponseEntity.status(HttpStatus.CREATED).body(AvailabilityResponse.from(saved));
     }
 

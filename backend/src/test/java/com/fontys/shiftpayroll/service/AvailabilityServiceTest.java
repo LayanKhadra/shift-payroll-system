@@ -1,11 +1,9 @@
 package com.fontys.shiftpayroll.service;
 
-import com.fontys.shiftpayroll.persistance.entities.AvailabilityEntity;
-import com.fontys.shiftpayroll.persistance.entities.EmployeeEntity;
-import com.fontys.shiftpayroll.dto.SetAvailabilityRequest;
-import com.fontys.shiftpayroll.persistance.AvailabilityJpaRepository;
-import com.fontys.shiftpayroll.persistance.EmployeeJpaRepository;
-import com.fontys.shiftpayroll.service.impl.AvailabilityServiceImpl;
+import com.fontys.shiftpayroll.domain.Availability;
+import com.fontys.shiftpayroll.domain.Employee;
+import com.fontys.shiftpayroll.interfaces.repoInterfaces.IAvailabilityRepo;
+import com.fontys.shiftpayroll.interfaces.repoInterfaces.IEmployeeRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,62 +25,81 @@ import static org.mockito.Mockito.when;
 
 class AvailabilityServiceTest {
 
-    private AvailabilityJpaRepository iAvailabilityRepository;
-    private EmployeeJpaRepository iEmployeeRepository;
-    private AvailabilityServiceImpl availabilityService;
+    private IAvailabilityRepo availabilityRepo;
+    private IEmployeeRepo employeeRepo;
+    private AvailabilityService availabilityService;
 
     @BeforeEach
     void setUp() {
-        iAvailabilityRepository = mock(AvailabilityJpaRepository.class);
-        iEmployeeRepository = mock(EmployeeJpaRepository.class);
-        availabilityService = new AvailabilityServiceImpl(iAvailabilityRepository, iEmployeeRepository);
+        availabilityRepo = mock(IAvailabilityRepo.class);
+        employeeRepo = mock(IEmployeeRepo.class);
+        availabilityService = new AvailabilityService(availabilityRepo, employeeRepo);
     }
 
     @Test
     void setAvailability_savesSuccessfully_whenTimesAreValid() {
         UUID employeeId = UUID.randomUUID();
-        EmployeeEntity employee = new EmployeeEntity("Sarah Okonkwo", new BigDecimal("18.50"));
-
-        when(iEmployeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(iAvailabilityRepository.save(any(AvailabilityEntity.class)))
+        givenEmployeeExists(employeeId);
+        when(availabilityRepo.save(any(Availability.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        SetAvailabilityRequest request = new SetAvailabilityRequest(
-                DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(17, 0)
-        );
 
-        AvailabilityEntity result = availabilityService.setAvailability(employeeId, request);
+        Availability result = availabilityService.setAvailability(
+                new Availability(employeeId, DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(17, 0)));
 
         assertEquals(DayOfWeek.MONDAY, result.getDay());
         assertEquals(LocalTime.of(9, 0), result.getStartTime());
         assertEquals(LocalTime.of(17, 0), result.getEndTime());
-        verify(iAvailabilityRepository, times(1)).save(any(AvailabilityEntity.class));
+        verify(availabilityRepo, times(1)).save(any(Availability.class));
     }
 
     @Test
     void setAvailability_throwsException_whenEndTimeNotAfterStartTime() {
         UUID employeeId = UUID.randomUUID();
 
-        SetAvailabilityRequest request = new SetAvailabilityRequest(
-                DayOfWeek.MONDAY, LocalTime.of(17, 0), LocalTime.of(9, 0)
-        );
+        assertThrows(IllegalArgumentException.class, () ->
+                availabilityService.setAvailability(
+                        new Availability(employeeId, DayOfWeek.MONDAY, LocalTime.of(17, 0), LocalTime.of(9, 0))));
+
+
+        verifyNoInteractions(availabilityRepo);
+    }
+    @Test
+    void setAvailability_throwsException_whenStartEqualsEnd() {
+        UUID employeeId = UUID.randomUUID();
 
         assertThrows(IllegalArgumentException.class, () ->
-                availabilityService.setAvailability(employeeId, request));
+                availabilityService.setAvailability(
+                        new Availability(employeeId, DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(9, 0))));
 
-        verifyNoInteractions(iAvailabilityRepository);
+        verifyNoInteractions(availabilityRepo);
+    }
+
+    @Test
+    void setAvailability_saves_whenEndIsOneMinuteAfterStart() {
+        UUID employeeId = UUID.randomUUID();
+        givenEmployeeExists(employeeId);
+        when(availabilityRepo.save(any(Availability.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Availability result = availabilityService.setAvailability(
+                new Availability(employeeId, DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(9, 1)));
+
+        assertEquals(LocalTime.of(9, 1), result.getEndTime());
     }
 
     @Test
     void setAvailability_throwsException_whenEmployeeNotFound() {
         UUID employeeId = UUID.randomUUID();
-        when(iEmployeeRepository.findById(employeeId)).thenReturn(Optional.empty());
-
-        SetAvailabilityRequest request = new SetAvailabilityRequest(
-                DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(17, 0)
-        );
+        when(employeeRepo.findById(employeeId)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () ->
-                availabilityService.setAvailability(employeeId, request));
+                availabilityService.setAvailability(
+                        new Availability(employeeId, DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(17, 0))));
+    }
+
+    private void givenEmployeeExists(UUID employeeId) {
+        when(employeeRepo.findById(employeeId)).thenReturn(
+                Optional.of(new Employee(employeeId, "Sarah Okonkwo", new BigDecimal("18.50"))));
     }
 }

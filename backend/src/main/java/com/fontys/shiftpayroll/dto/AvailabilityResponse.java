@@ -1,7 +1,7 @@
 package com.fontys.shiftpayroll.dto;
 
 
-import com.fontys.shiftpayroll.persistance.entities.AvailabilityEntity;
+import com.fontys.shiftpayroll.domain.Availability;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -14,10 +14,10 @@ public record AvailabilityResponse (
         LocalTime startTime,
         LocalTime endTime
 ) {
-    public static AvailabilityResponse from(AvailabilityEntity availability) {
+    public static AvailabilityResponse from(Availability availability) {
         return new AvailabilityResponse(
                 availability.getId(),
-                availability.getEmployee().getId(),
+                availability.getEmployeeId(),
                 availability.getDay(),
                 availability.getStartTime(),
                 availability.getEndTime()
