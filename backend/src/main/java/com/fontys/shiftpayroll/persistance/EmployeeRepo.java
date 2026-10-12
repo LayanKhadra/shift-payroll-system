@@ -5,6 +5,7 @@ import com.fontys.shiftpayroll.interfaces.repoInterfaces.IEmployeeRepo;
 import com.fontys.shiftpayroll.persistance.entities.EmployeeEntity;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,6 +22,13 @@ public class EmployeeRepo implements IEmployeeRepo {
         // 1 fetch from the database (returns an entity)
         // 2 map to domain
         return employeeJpaRepository.findById(id).map(EmployeeRepo::toDomain);
+    }
+
+    @Override
+    public List<Employee> findAll() {
+        return employeeJpaRepository.findAll().stream()
+                .map(EmployeeRepo::toDomain)
+                .toList();
     }
 
     private static Employee toDomain(EmployeeEntity entity) {
